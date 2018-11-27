@@ -229,12 +229,17 @@ end
 
 %% Common Setup
 
-% Set the gains on the arm, set a bunch of times in a loop to make
-% absolutely sure they get set.
-numSends = 20;
-for i=1:numSends
-    fbk = group.getNextFeedback();
-    group.send('gains',params.gains);
+% Set the gains on the arm, using acknowledgements to make sure it gets
+% sent.
+numSends = 0;
+maxSends = 20;
+ack = false;
+while ~ack
+    group.send( 'gains', params.gains, 'ack', true );
+    numSends = numSends + 1;
+    if numSends > maxSends
+        error('Could receive acknowledgement from at least 1 module');
+    end
 end
 
 % Determine initial gravity vector based on the internal pose filter of

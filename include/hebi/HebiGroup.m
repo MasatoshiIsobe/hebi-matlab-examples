@@ -184,7 +184,7 @@ classdef (Sealed) HebiGroup < handle
             setCommandLifetime(this.obj, varargin{:});
         end
         
-        function [] = send(this, varargin)
+        function out = send(this, varargin)
             %send sends commands and settings to modules.
             %
             %   This method provides a variety of selectors to send commands, gains,
@@ -271,6 +271,12 @@ classdef (Sealed) HebiGroup < handle
             %   'PositionLimit' ('PosLim') sets safety limits for position.
             %   Safety limits act as a virtual hard stop and are independent of gains.
             %
+            %   'VelocityLimit' ('VelLim') sets safety limits for velocity.
+            %   Safety limits act as a virtual hard stop and are independent of gains.
+            %
+            %   'EffortLimit' ('EffLim') sets safety limits for effort.
+            %   Safety limits act as a virtual hard stop and are independent of gains.
+            %
             %   'ReferencePosition' sets the current position (feedback) by adjusting
             %   the user-settable reference point for the zero position. This persists
             %   automatically. This is the same as setting the reference point for
@@ -285,8 +291,16 @@ classdef (Sealed) HebiGroup < handle
             %   that is used to turn its sensed spring deflection into an estimated 
             %   effort (torque). This is a linear spring constant, units are Nm/rad. 
             %   The current spring constant can be determined by getting a 'full' 
-            %   feedback and dividing the -torque by the measured deflection 
-            %   (-1 * fbk.torque ./ fbk.deflection).
+            %   feedback and dividing the negative effort by the measured deflection 
+            %   (-fbk.effort ./ fbk.deflection).
+            %
+            %   'RequestAck' ('Ack') requests message acknowledgements from each 
+            %   device. This method will return true if acknowledgements have been
+            %   received from all devices within this group and within the specified
+            %   timeout.
+            %   
+            %   'Timeout' [s] the deadline for receiving acknowledgements before
+            %   this method aborts and returns false. (Default 0.5s)
             %
             %   Note that all options can be combined as required. Options that get set
             %   in the same function call will be packed into the same outgoing packet.
@@ -296,7 +310,7 @@ classdef (Sealed) HebiGroup < handle
             %      group.send('family', 'MyRobot', 'led', 'r');
             %
             %   See also HebiGroup, CommandStruct, GainStruct
-            send(this.obj, varargin{:});
+            out = send(this.obj, varargin{:});
         end
               
         function out = get(this, varargin)
