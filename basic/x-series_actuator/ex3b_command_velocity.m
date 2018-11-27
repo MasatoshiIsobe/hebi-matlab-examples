@@ -31,7 +31,7 @@ freqHz = 0.5;           % [Hz]
 freq = freqHz * 2*pi;   % [rad / sec]
 amp = 1.0;              % [rad / sec]
 
-duration = 10; % [sec]
+duration = 8; % [sec]
 timer = tic();
 while toc(timer) < duration
     

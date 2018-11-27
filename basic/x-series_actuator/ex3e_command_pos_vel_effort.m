@@ -16,7 +16,7 @@
 
 %% Setup
 clear *;
-close all;
+% close all;
 HebiLookup.initialize();
 
 familyName = 'Test Family';
@@ -28,15 +28,15 @@ cmd = CommandStruct();
 group.startLog( 'dir', 'logs' );
 
 % Parameters for sin/cos function
-freqHz = 1.0;           % [Hz]
+freqHz = 2.0;           % [Hz]
 freq = freqHz * 2*pi;   % [rad / sec]
-amp = deg2rad( 45 );    % [rad]
+amp = deg2rad( 15 );    % [rad]
 
 % Inertia parameters for converting acceleration to torque.  This inertia
 % value corresponds to roughly a 300mm X5 link extending off the output. 
-inertia = .01; % [kg * m^2]
+inertia = .05; % [kg * m^2]
 
-duration = 10; % [sec]
+duration = 8; % [sec]
 timer = tic();
 while toc(timer) < duration
     
@@ -62,8 +62,12 @@ while toc(timer) < duration
    
 end
 
+% Stop the motion
+cmd = CommandStruct();
+group.send(cmd);
+
 % Stop logging and plot the commands using helper functions
 log = group.stopLog();
-HebiUtils.plotLogs( log, 'position', 'figNum', 101 );
-HebiUtils.plotLogs( log, 'velocity', 'figNum', 102 );
-HebiUtils.plotLogs( log, 'effort', 'figNum', 103 );
+HebiUtils.plotLogs( log, 'position' );
+HebiUtils.plotLogs( log, 'velocity' );
+HebiUtils.plotLogs( log, 'effort');

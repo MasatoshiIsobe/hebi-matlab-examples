@@ -135,10 +135,10 @@ switch kit
             'Wrist2' });
         
         % Kinematic Model
-        kin = HebiKinematics([localDir 'hrdf/5-DoF_arm']);
+        kin = HebiKinematics([localDir '/hrdf/5-DoF_arm']);
         
         % Load and send arm gains
-        params.gains = HebiUtils.loadGains([localDir 'gains/5-DoF_arm_gains']);     
+        params.gains = HebiUtils.loadGains([localDir '/gains/5-DoF_arm_gains']);     
         
         % No Gripper
         params.hasGripper = false;
@@ -159,10 +159,10 @@ switch kit
             'Wrist1' });
         
         % Kinematic Model
-        kin = HebiKinematics([localDir 'hrdf/4-DoF_arm']);
+        kin = HebiKinematics([localDir '/hrdf/4-DoF_arm']);
         
         % Load and send arm gains
-        params.gains = HebiUtils.loadGains([localDir 'gains/4-DoF_arm_gains']);     
+        params.gains = HebiUtils.loadGains([localDir '/gains/4-DoF_arm_gains']);     
                 
         % No Gripper
         params.hasGripper = false;
@@ -183,10 +183,10 @@ switch kit
             'Wrist1' });
         
         % Kinematic Model
-        kin = HebiKinematics([localDir 'hrdf/4-DoF_arm_scara']);
+        kin = HebiKinematics([localDir '/hrdf/4-DoF_arm_scara']);
         
         % Load and send arm gains
-        params.gains = HebiUtils.loadGains([localDir 'gains/5-DoF_arm_scara_gains']);     
+        params.gains = HebiUtils.loadGains([localDir '/gains/5-DoF_arm_scara_gains']);     
                 
         % No Gripper
         params.hasGripper = false;
@@ -208,7 +208,7 @@ switch kit
         kin = HebiKinematics([localDir '/hrdf/3-DoF_arm']);
         
         % Load and send arm gains
-        params.gains = HebiUtils.loadGains([localDir 'gains/3-DoF_arm_gains']);     
+        params.gains = HebiUtils.loadGains([localDir '/gains/3-DoF_arm_gains']);     
                 
         % No Gripper
         params.hasGripper = false;
@@ -235,12 +235,15 @@ numSends = 0;
 maxSends = 20;
 ack = false;
 while ~ack
-    group.send( 'gains', params.gains, 'ack', true );
+    ack = group.send( 'gains', params.gains, 'ack', true );
     numSends = numSends + 1;
     if numSends > maxSends
-        error('Could receive acknowledgement from at least 1 module');
+        error('Could not receive acknowledgement from at least 1 module');
     end
 end
+
+% Pause to make sure the lookup process has time to updates
+pause(1.0);
 
 % Determine initial gravity vector based on the internal pose filter of
 % the base module.

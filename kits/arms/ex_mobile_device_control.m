@@ -55,7 +55,7 @@ end
 % Arm Setup %
 %%%%%%%%%%%%%
 
-armName = '6-DoF + gripper';
+armName = '3-DoF';
 armFamily = 'Arm';
 hasGasSpring = true;
 

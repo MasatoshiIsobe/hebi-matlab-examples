@@ -11,7 +11,7 @@
 
 %% Setup
 clear *;
-close all;
+% close all;
 HebiLookup.initialize();
 
 familyName = 'Test Family';
@@ -27,11 +27,11 @@ cmd = CommandStruct();
 group.startLog( 'dir', 'logs' );  
 
 % Parameters for sin/cos function
-freqHz = 1.0;           % [Hz]
+freqHz = 0.5;           % [Hz]
 freq = freqHz * 2*pi;   % [rad / sec]
-amp = deg2rad( 45 );    % [rad]
+amp = deg2rad( 25 );    % [rad]
 
-duration = 10; % [sec]
+duration = 8; % [sec]
 timer = tic();
 while toc(timer) < duration
     
@@ -44,6 +44,10 @@ while toc(timer) < duration
     group.send(cmd); 
     
 end
+
+% Stop the motion
+cmd = CommandStruct();
+group.send(cmd);
 
 % Stop logging and plot the position data using helper functions
 log = group.stopLog();

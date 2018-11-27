@@ -21,9 +21,9 @@ close all;
 
 HebiLookup.initialize();
 
-armName = '6-DoF + gripper';
+armName = '3-DoF';
 armFamily = 'Arm';
-hasGasSpring = true;
+hasGasSpring = false;
 
 [ armGroup, armKin, armParams ] = setupArm( armName, armFamily, hasGasSpring );      
 
@@ -39,6 +39,7 @@ armGroup.setFeedbackFrequency(200);
 
 % Double the effort gains from their default values, to make the arm more
 % sensitive for tracking force.
+
 gains = armGroup.getGains();
 gains.effortKp = 2 * gains.effortKp;
 armGroup.send('gains',gains);
@@ -76,22 +77,27 @@ disp('  ESC - Exits the demo.');
 % UNCOMMENT THE GAINS YOU WANT TO USE FOR A GIVEN RUN, AND COMMENT OUT ALL
 % THE OTHER GAINS.
 
-%     % HOLD POSITION ONLY (Allow rotation around end-effector position)
-%     gainsInEndEffectorFrame = true;
+    % 3-DOF HOLD POSITION IN XY-PLANE 
+    gainsInEndEffectorFrame = false;
+    damperGains = [0; 0; 5; .0; .0; .0;]; % (N/(m/sec)) or (Nm/(rad/sec))
+    springGains = [0; 0; 500; 0; 0; 0];  % (N/m) or (Nm/rad)
+
+%     % 3-DOF HOLD POSITION ONLY 
+%     gainsInEndEffectorFrame = false;
 %     damperGains = [5; 5; 5; .0; .0; .0;]; % (N/(m/sec)) or (Nm/(rad/sec))
 %     springGains = [500; 500; 500; 0; 0; 0];  % (N/m) or (Nm/rad)
 
-%     % HOLD ROTATION ONLY
+%     % 6-DOF HOLD ROTATION ONLY
 %     gainsInEndEffectorFrame = true;
 %     damperGains = [0; 0; 0; .1; .1; .1;]; % (N/(m/sec)) or (Nm/(rad/sec))
 %     springGains = [0; 0; 0; 5; 5; 5];  % (N/m) or (Nm/rad)
  
-    % HOLD POSITION AND ROTATION - BUT ALLOW MOTION ALONG/AROUND Z-AXIS
-    gainsInEndEffectorFrame = true;
-    damperGains = [10; 10; 0; .1; .1; .1;]; % (N/(m/sec)) or (Nm/(rad/sec))
-    springGains = [500; 500; 0; 5; 5; 5];  % (N/m) or (Nm/rad)
+%     % 6-DOF HOLD POSITION AND ROTATION - BUT ALLOW MOTION ALONG/AROUND Z-AXIS
+%     gainsInEndEffectorFrame = true;
+%     damperGains = [10; 10; 0; .1; .1; .1;]; % (N/(m/sec)) or (Nm/(rad/sec))
+%     springGains = [500; 500; 0; 5; 5; 5];  % (N/m) or (Nm/rad)
     
-%     % HOLD POSITION AND ROTATION - BUT ALLOW MOTION IN BASE FRAME XY-PLANE
+%     % 6-DOF HOLD POSITION AND ROTATION - BUT ALLOW MOTION IN BASE FRAME XY-PLANE
 %     gainsInEndEffectorFrame = false;
 %     damperGains = [0; 0; 5; .1; .1; .1;]; % (N/(m/sec)) or (Nm/(rad/sec))
 %     springGains = [0; 0; 500; 5; 5; 5];  % (N/m) or (Nm/rad)

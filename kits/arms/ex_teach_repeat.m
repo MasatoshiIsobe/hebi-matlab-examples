@@ -18,15 +18,15 @@
 clear *;
 close all;
 
-armName = '6-DoF + gripper';
+armName = '3-DoF';
 armFamily = 'Arm';
-hasGasSpring = true;
+hasGasSpring = false;
 
 [ armGroup, armKin, armParams ] = setupArm( armName, armFamily, hasGasSpring );
 armGroup.setFeedbackFrequency(100);
 
 numDoF = armKin.getNumDoF();
-
+  
 effortOffset = armParams.effortOffset;
 gravityVec = armParams.gravityVec;
 localDir = armParams.localDir;
