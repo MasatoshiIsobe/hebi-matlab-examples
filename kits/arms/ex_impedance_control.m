@@ -77,9 +77,9 @@ disp('  ESC - Exits the demo.');
 % THE OTHER GAINS.
 
 %     % HOLD POSITION ONLY (Allow rotation around end-effector position)
-%     gainsInEndEffectorFrame = true;
-%     damperGains = [5; 5; 5; .0; .0; .0;]; % (N/(m/sec)) or (Nm/(rad/sec))
-%     springGains = [500; 500; 500; 0; 0; 0];  % (N/m) or (Nm/rad)
+    gainsInEndEffectorFrame = true;
+    damperGains = [5; 5; 5; .0; .0; .0;]; % (N/(m/sec)) or (Nm/(rad/sec))
+    springGains = [500; 500; 500; 0; 0; 0];  % (N/m) or (Nm/rad)
 
 %     % HOLD ROTATION ONLY
 %     gainsInEndEffectorFrame = true;
@@ -87,9 +87,9 @@ disp('  ESC - Exits the demo.');
 %     springGains = [0; 0; 0; 5; 5; 5];  % (N/m) or (Nm/rad)
  
     % HOLD POSITION AND ROTATION - BUT ALLOW MOTION ALONG/AROUND Z-AXIS
-    gainsInEndEffectorFrame = true;
-    damperGains = [10; 10; 0; .1; .1; .1;]; % (N/(m/sec)) or (Nm/(rad/sec))
-    springGains = [500; 500; 0; 5; 5; 5];  % (N/m) or (Nm/rad)
+%     gainsInEndEffectorFrame = true;
+%     damperGains = [10; 10; 0; .1; .1; .1;]; % (N/(m/sec)) or (Nm/(rad/sec))
+%     springGains = [500; 500; 0; 5; 5; 5];  % (N/m) or (Nm/rad)
     
 %     % HOLD POSITION AND ROTATION - BUT ALLOW MOTION IN BASE FRAME XY-PLANE
 %     gainsInEndEffectorFrame = false;
