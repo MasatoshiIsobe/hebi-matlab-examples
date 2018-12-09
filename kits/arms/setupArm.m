@@ -65,6 +65,7 @@ else
     shoulderJointComp = 0;
 end
 
+hasGasSpring = false;
 
 %% Setup kinematic models
 switch kit
