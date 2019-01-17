@@ -282,10 +282,16 @@ classdef (Sealed) HebiGroup < handle
             %   automatically. This is the same as setting the reference point for
             %   Position in the 'Device' tab of the Scope GUI.
             %
-            %   'ReferenceEffort' sets the current effort (feedback) by adjusting
-            %   the user-settable reference point for zero effort. This persists
-            %   automatically.  This is the same as setting the reference point
-            %   for Effort in the 'Device' tab of the Scope GUI.
+            %   'OffsetReferencePosition' offsets the current position (feedback) by
+            %   offsetting the user-settable reference point for the zero position.
+            %   
+            %   'ZeroReferenceDeflection' sets the deflection of the internal spring
+            %   to zero. Note that this will also cause the effort (feedback) to also be
+            %   zero. Only do this when the actuator is unloaded.
+            %
+            %   'OffsetReferenceDeflection' adjusts the internal spring deflection. Note
+            %   that this will cause a jump in the effort feedback that depends on the
+            %   spring constant (may or may not be linear).
             %
             %   'SpringConstant' sets the internal stiffness parameter for an actuator
             %   that is used to turn its sensed spring deflection into an estimated 
