@@ -17,8 +17,8 @@ close all;
 
 HebiLookup.initialize();
 
-armName = '3-DoF';
-armFamily = 'Arm';
+armName = '6-DoF';
+armFamily = 'DaveArm';
 hasGasSpring = false;
 
 [ armGroup, armKin, armParams ] = setupArm( armName, armFamily, hasGasSpring );

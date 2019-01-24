@@ -110,10 +110,10 @@ switch kit
             'Wrist3' });
         
         % Kinematic Model
-        kin = HebiKinematics([localDir '/hrdf/6-DoF_arm']);
+        kin = HebiKinematics([localDir '/hrdf/6-DoF_arm_dave']);
         
         % Load and send arm gains
-        params.gains = HebiUtils.loadGains([localDir '/gains/6-DoF_arm_gains']);     
+        params.gains = HebiUtils.loadGains([localDir '/gains/6-DoF_arm_gains_dave']);     
         
         % No Gripper
         params.hasGripper = false;
@@ -162,8 +162,8 @@ switch kit
         kin = HebiKinematics([localDir '/hrdf/4-DoF_arm']);
         
         % Load and send arm gains
-        params.gains = HebiUtils.loadGains([localDir '/gains/4-DoF_arm_gains']);     
-                
+        params.gains = HebiUtils.loadGains([localDir '/gains/4-DoF_arm_gains']);                   
+        
         % No Gripper
         params.hasGripper = false;
         
@@ -253,6 +253,9 @@ baseRotMat = HebiUtils.quat2rotMat( [ fbk.orientationW(1), ...
                                       fbk.orientationY(1), ...
                                       fbk.orientationZ(1) ] );
 params.gravityVec = -baseRotMat(3,1:3);
+
+% Assume arm is upright
+params.gravityVec = -[0 0 1];
 
 end
 

@@ -21,8 +21,8 @@ close all;
 
 HebiLookup.initialize();
 
-armName = '3-DoF';
-armFamily = 'Arm';
+armName = '6-DoF';
+armFamily = 'DaveArm';
 hasGasSpring = false;
 
 [ armGroup, armKin, armParams ] = setupArm( armName, armFamily, hasGasSpring );      
@@ -35,14 +35,7 @@ localDir = armParams.localDir;
 % high level for damping.  Going faster can help reduce a little bit of
 % jitter for fast motions, but going slower (100 Hz) also works just fine
 % for most applications.
-armGroup.setFeedbackFrequency(200); 
-
-% Double the effort gains from their default values, to make the arm more
-% sensitive for tracking force.
-
-gains = armGroup.getGains();
-gains.effortKp = 2 * gains.effortKp;
-armGroup.send('gains',gains);
+armGroup.setFeedbackFrequency(200);
 
 numDoF = armKin.getNumDoF;
 
@@ -52,6 +45,30 @@ enableLogging = true;
 if enableLogging
    logFile = armGroup.startLog('dir',[localDir '/logs']); 
 end
+
+% Load the get the stiffness parameters of the actuators.
+load('latestStiffnessCoeffs.mat');
+baseStiffness = stiffnessCoeffs(:,end)';
+fbkStiffness = baseStiffness;
+
+% Get gains from the arm for scaling later
+gainScalingOn = false;
+gainScaleFactor = 0.3;
+
+armGains = armGroup.getGains();
+stiffnessNormalize = 100 ./ baseStiffness;
+armGains.effortKp = stiffnessNormalize .* armGains.effortKp;
+armGains.effortKd = stiffnessNormalize .* armGains.effortKd;
+
+
+scaledGains = GainStruct();
+scaledGains.effortKp = armGains.effortKp;
+scaledGains.effortKi = armGains.effortKi;
+scaledGains.effortKd = armGains.effortKd;
+baseEffortKp = armGains.effortKp;
+baseEffortKi = armGains.effortKi;
+baseEffortKd = armGains.effortKd;
+
 
 %% Gravity compensated mode
 cmd = CommandStruct();
@@ -77,27 +94,32 @@ disp('  ESC - Exits the demo.');
 % UNCOMMENT THE GAINS YOU WANT TO USE FOR A GIVEN RUN, AND COMMENT OUT ALL
 % THE OTHER GAINS.
 
-    % 3-DOF HOLD POSITION IN XY-PLANE 
-    gainsInEndEffectorFrame = false;
-    damperGains = [0; 0; 5; .0; .0; .0;]; % (N/(m/sec)) or (Nm/(rad/sec))
-    springGains = [0; 0; 500; 0; 0; 0];  % (N/m) or (Nm/rad)
+%     % 3-DOF HOLD POSITION IN XY-PLANE 
+%     gainsInEndEffectorFrame = false;
+%     damperGains = [0; 0; 5; .0; .0; .0;]; % (N/(m/sec)) or (Nm/(rad/sec))
+%     springGains = [0; 0; 500; 0; 0; 0];  % (N/m) or (Nm/rad)
 
-%     % 3-DOF HOLD POSITION ONLY 
+%     % 3-DOF /6-DOF ARM HOLD POSITION ONLY 
 %     gainsInEndEffectorFrame = false;
 %     damperGains = [5; 5; 5; .0; .0; .0;]; % (N/(m/sec)) or (Nm/(rad/sec))
 %     springGains = [500; 500; 500; 0; 0; 0];  % (N/m) or (Nm/rad)
 
-%     % 6-DOF HOLD ROTATION ONLY
+%     % 6-DOF ARM  HOLD ROTATION ONLY
 %     gainsInEndEffectorFrame = true;
 %     damperGains = [0; 0; 0; .1; .1; .1;]; % (N/(m/sec)) or (Nm/(rad/sec))
 %     springGains = [0; 0; 0; 5; 5; 5];  % (N/m) or (Nm/rad)
+
+    % 6-DOF ARM HOLD POSITION AND ROTATION 
+    gainsInEndEffectorFrame = false;
+    damperGains = [5; 5; 5; .1; .1; .1;]; % (N/(m/sec)) or (Nm/(rad/sec))
+    springGains = [500; 500; 500 ; 10; 10; 10 ];  % (N/m) or (Nm/rad)
  
-%     % 6-DOF HOLD POSITION AND ROTATION - BUT ALLOW MOTION ALONG/AROUND Z-AXIS
+%     % 6-DOF ARM HOLD POSITION AND ROTATION - BUT ALLOW MOTION ALONG/AROUND Z-AXIS
 %     gainsInEndEffectorFrame = true;
 %     damperGains = [10; 10; 0; .1; .1; .1;]; % (N/(m/sec)) or (Nm/(rad/sec))
 %     springGains = [500; 500; 0; 5; 5; 5];  % (N/m) or (Nm/rad)
     
-%     % 6-DOF HOLD POSITION AND ROTATION - BUT ALLOW MOTION IN BASE FRAME XY-PLANE
+%     % 6-DOF ARM HOLD POSITION AND ROTATION - BUT ALLOW MOTION IN BASE FRAME XY-PLANE
 %     gainsInEndEffectorFrame = false;
 %     damperGains = [0; 0; 5; .1; .1; .1;]; % (N/(m/sec)) or (Nm/(rad/sec))
 %     springGains = [0; 0; 500; 5; 5; 5];  % (N/m) or (Nm/rad)
@@ -117,7 +139,7 @@ armCmdJointVels = zeros(1,numDoF);
 while ~keys.ESC   
     
     % Gather sensor data from the arm
-    fbk = armGroup.getNextFeedback();
+    fbk = armGroup.getNextFeedbackFull();
     
     %%%%%%%%%%%%%%%%%%%%%%%%
     % Gravity Compensation %
@@ -170,15 +192,40 @@ while ~keys.ESC
     else
         impedanceEfforts = zeros(numDoF,1);
     end
-    
+        
     % Add all the different torques together
     cmd.effort = gravCompEfforts + impedanceEfforts' + effortOffset;
 
-    % Send to robot
-    armGroup.send(cmd);
-
     % Check for new key presses on the keyboard
     keys = read(kb);
+    
+    % Scale gains based on stiffness
+    if keys.ALT == 1 && prevKeys.ALT == 0      
+        gainScalingOn = ~gainScalingOn;
+        if gainScalingOn
+            disp('Gain Scaling ENABLED.');
+        else
+            disp('Gain Scaling DISABLED.');
+        end
+    end
+    
+    if gainScalingOn
+        for i = 1:numDoF
+            fbkStiffness(i) = polyval( stiffnessCoeffs(i,:), -fbk.deflection(i) );
+        end
+        compStiffness = baseStiffness + gainScaleFactor * ...
+                                            (fbkStiffness - baseStiffness);
+        gainScales = baseStiffness ./ compStiffness;
+    else
+        gainScales = ones(1,numDoF);
+    end
+    
+    scaledGains.effortKp = gainScales .* baseEffortKp;
+    scaledGains.effortKi = gainScales .* baseEffortKi;
+    scaledGains.effortKd = gainScales .* baseEffortKd;
+
+    % Send to robot
+    armGroup.send(cmd,'gains',scaledGains);
 
     % Toggle impedance
     if keys.SPACE == 1 && prevKeys.SPACE == 0      
@@ -201,24 +248,79 @@ end
 %%
 % Stop Logging
 if enableLogging  
-   hebilog = armGroup.stopLogFull();
+    hebilog = armGroup.stopLogFull();
 end
 
 %%
 % Plotting
 if enableLogging
    
-   % Plot tracking / error from the joints in the arm.  Note that there
-   % will not by any 'error' in tracking for position and velocity, since
-   % this example only commands effort.
-   HebiUtils.plotLogs(hebilog, 'position');
-   HebiUtils.plotLogs(hebilog, 'velocity');
-   HebiUtils.plotLogs(hebilog, 'effort');
+    % Plot tracking / error from the joints in the arm.  Note that there
+    % will not by any 'error' in tracking for position and velocity, since
+    % this example only commands effort.
+    HebiUtils.plotLogs(hebilog, 'position');
+    HebiUtils.plotLogs(hebilog, 'velocity');
+    HebiUtils.plotLogs(hebilog, 'effort');
+
+    % Plot the end-effectory trajectory and error
+    kinematics_analysis( hebilog, armKin );
    
-   % Plot the end-effectory trajectory and error
-   kinematics_analysis( hebilog, armKin );
-   
-   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   % Feel free to put more plotting code here %
-   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Feel free to put more plotting code here %
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    logLength =  length(hebilog.time);
+    localStiffness = nan(logLength,numDoF);
+    for i = 1:numDoF
+        localStiffness(:,i) = polyval( stiffnessCoeffs(i,:), ...
+                                      -hebilog.deflection(:,i) );
+    end
+    cumulativeStiffness = -hebilog.effort ./ hebilog.deflection;
+    baseStiffnesses = repmat(baseStiffness,logLength,1);
+    
+    gainScalesOld = baseStiffnesses ./ cumulativeStiffness;
+    
+    compStiffnesses = baseStiffnesses + gainScaleFactor * ...
+                     (localStiffness - baseStiffnesses);
+    gainScaleNew = baseStiffnesses ./ compStiffnesses;
+
+    figure();
+    plot(hebilog.time,localStiffness);
+    title('Stiffness vs Time');
+    xlabel('time (sec)');
+    ylabel('stiffness (Nm / rad)');
+    legend(armGroup.getInfo.name);
+    grid on;
+    
+    figure();
+    ax = subplot(1,1,1);
+    plot(rad2deg(-hebilog.deflection),gainScaleNew);   
+    hold on;
+    ax.ColorOrderIndex = 1;
+    plot(rad2deg(-hebilog.deflection),gainScalesOld,':');
+    hold off;
+    title('Gain Scale vs Time');
+    xlabel('deflection (deg)');
+    ylabel('scaling factor');
+    ylim([0 1.3]);
+    legend(armGroup.getInfo.name);
+    grid on;
+
+    figure();
+    ax = subplot(2,1,1);
+    plot(rad2deg(-hebilog.deflection),localStiffness);
+    title('Stiffness vs Deflection');
+    xlabel('deflection (deg)');
+    ylabel('stiffness (Nm / rad)');
+    legend(armGroup.getInfo.name,'location','southwest');
+    grid on;
+
+    ax = subplot(2,1,2);
+    plot(hebilog.effort,localStiffness);
+    title('Stiffness vs Effort');
+    xlabel('effort (Nm)');
+    ylabel('stiffness (Nm / rad)');
+    legend(armGroup.getInfo.name,'location','southwest');
+    grid on;
+
 end

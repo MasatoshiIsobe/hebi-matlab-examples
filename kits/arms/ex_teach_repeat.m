@@ -18,8 +18,8 @@
 clear *;
 close all;
 
-armName = '3-DoF';
-armFamily = 'Arm';
+armName = '6-DoF';
+armFamily = 'DaveArm';
 hasGasSpring = false;
 
 [ armGroup, armKin, armParams ] = setupArm( armName, armFamily, hasGasSpring );
@@ -35,7 +35,7 @@ localDir = armParams.localDir;
 trajGen = HebiTrajectoryGenerator(armKin);
 trajGen.setMinDuration(1.0); % Min move time for 'small' movements
                              % (default is 1.0)
-trajGen.setSpeedFactor(0.75); % Slow down movements to a safer speed.
+trajGen.setSpeedFactor(1.0); % Slow down movements to a safer speed.
                              % (default is 1.0)
 % Keyboard input
 kb = HebiKeyboard();
