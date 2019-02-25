@@ -40,7 +40,7 @@ armGroup.setFeedbackFrequency(200);
 % Double the effort gains from their default values, to make the arm more
 % sensitive for tracking force.
 gains = armGroup.getGains();
-gains.effortKp = 2 * gains.effortKp;
+gains.effortKp = 1.2  * gains.effortKp;
 armGroup.send('gains',gains);
 
 numDoF = armKin.getNumDoF;
@@ -79,12 +79,12 @@ disp('  ESC - Exits the demo.');
 %     % HOLD POSITION ONLY (Allow rotation around end-effector position)
     gainsInEndEffectorFrame = true;
     damperGains = [5; 5; 5; .0; .0; .0;]; % (N/(m/sec)) or (Nm/(rad/sec))
-    springGains = [500; 500; 500; 0; 0; 0];  % (N/m) or (Nm/rad)
+    springGains = [500; 500; 500; 0; 0; 0];  % (N/m) or (Nm/rad) 
 
 %     % HOLD ROTATION ONLY
 %     gainsInEndEffectorFrame = true;
 %     damperGains = [0; 0; 0; .1; .1; .1;]; % (N/(m/sec)) or (Nm/(rad/sec))
-%     springGains = [0; 0; 0; 5; 5; 5];  % (N/m) or (Nm/rad)
+%     springGains = [0; 0; 0; 5; 5; 5];  % (N/m ) or (Nm/rad)
  
     % HOLD POSITION AND ROTATION - BUT ALLOW MOTION ALONG/AROUND Z-AXIS
 %     gainsInEndEffectorFrame = true;
