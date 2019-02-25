@@ -19,7 +19,7 @@
 clear *;
 close all;
 
-HebiLookup.initialize();
+HebiLookup.initialize(); 
 
 armName = '6-DoF + gripper';
 armFamily = 'Arm';
