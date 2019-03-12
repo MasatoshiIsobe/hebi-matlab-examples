@@ -138,7 +138,7 @@ switch kit
         kin = HebiKinematics([localDir 'hrdf/5-DoF_arm']);
         
         % Load and send arm gains
-        params.gains = HebiUtils.loadGains([localDir 'gains/5-DoF_arm_gains']);     
+        params.gains = HebiUtils.loadGains([localDir '/gains/5-DoF_arm_gains']);     
         
         % No Gripper
         params.hasGripper = false;
@@ -162,7 +162,7 @@ switch kit
         kin = HebiKinematics([localDir 'hrdf/4-DoF_arm']);
         
         % Load and send arm gains
-        params.gains = HebiUtils.loadGains([localDir 'gains/4-DoF_arm_gains']);     
+        params.gains = HebiUtils.loadGains([localDir '/gains/4-DoF_arm_gains']);     
                 
         % No Gripper
         params.hasGripper = false;
@@ -186,7 +186,7 @@ switch kit
         kin = HebiKinematics([localDir 'hrdf/4-DoF_arm_scara']);
         
         % Load and send arm gains
-        params.gains = HebiUtils.loadGains([localDir 'gains/5-DoF_arm_scara_gains']);     
+        params.gains = HebiUtils.loadGains([localDir '/gains/5-DoF_arm_scara_gains']);     
                 
         % No Gripper
         params.hasGripper = false;
@@ -208,7 +208,7 @@ switch kit
         kin = HebiKinematics([localDir '/hrdf/3-DoF_arm']);
         
         % Load and send arm gains
-        params.gains = HebiUtils.loadGains([localDir 'gains/3-DoF_arm_gains']);     
+        params.gains = HebiUtils.loadGains([localDir '/gains/3-DoF_arm_gains']);     
                 
         % No Gripper
         params.hasGripper = false;
@@ -217,7 +217,7 @@ switch kit
         params.effortOffset = [0 shoulderJointComp 0];
         
         % Default seed positions for doing inverse kinematics
-        params.ikSeedPos = [0.01 1.0 2.5];
+        params.ikSeedPos = [0.01 -pi/4 -pi/2];
         
     case '2-DoF'
         %%
